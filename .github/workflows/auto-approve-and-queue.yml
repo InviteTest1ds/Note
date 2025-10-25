@@ -1,0 +1,28 @@
+name: Auto Approve and Queue
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  auto-approve-and-queue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Approve PR automatically
+        uses: hmarr/auto-approve-action@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add PR to merge queue
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} --merge --queue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
